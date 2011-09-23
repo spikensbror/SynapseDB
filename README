@@ -1,0 +1,10 @@
+SynapseDB
+A very secure and lightweight database handler.
+
+Features & Concepts:
+- Hybrid SQL engine with support for MySQL and MsSQL databases simultaneously
+- Easy to use and implement
+- Secure
+
+See the Wiki for the PHP reference and the example directory for a working
+implementation.
