@@ -107,8 +107,6 @@ abstract class SynapseDatabase
 						unset($row[$key]);
 						continue;
 					}
-					if(is_numeric($value))
-						$row[$key] = (int)$value;
 				}
 				return $row;
 			}
