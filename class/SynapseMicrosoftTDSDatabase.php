@@ -18,36 +18,22 @@ class SynapseMicrosoftTDSDatabase extends SynapseDatabase
 		return @mssql_query($query, $this->_Connection);
 	}
 	
-	protected function _Fetch($type, $query)
+	protected function _FetchAll()
 	{
 		$return = array();
-		switch($type)
-		{
-			case SDB_FETCH_BOTH:
-			{
-				while($fetch = mssql_fetch_array($query))
-					$return[] = $fetch;
-				break;
-			}
-			case SDB_FETCH_ASSOC:
-			{
-				while($fetch = mssql_fetch_assoc($query))
-					$return[] = $fetch;
-				break;
-			}
-			case SDB_FETCH_NUMERIC:
-			{
-				while($fetch = mssql_fetch_row($query))
-					$return[] = $fetch;
-				break;
-			}
-		}
+		while($fetch = mssql_fetch_array($this->_Result))
+			$return[] = $fetch;
 		return $return;
 	}
 	
 	protected function _Close()
 	{
 		mssql_close($this->_Connection);
+	}
+	
+	protected function _Free()
+	{
+		mssql_free_result($this->_Result);
 	}
 	
 	protected function _Sanitize($argument)

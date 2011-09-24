@@ -1,5 +1,8 @@
 <?php
 
+// Debug mode.
+define('SDB_DEBUG', true);
+
 // Database types.
 define('SDB_MYSQL', 0);
 define('SDB_MSSQL', 1);

@@ -18,36 +18,22 @@ class SynapseMicrosoftDatabase extends SynapseDatabase
 		return @sqlsrv_query($this->_Connection, $query);
 	}
 	
-	protected function _Fetch($type, $query)
+	protected function _FetchAll()
 	{
 		$return = array();
-		switch($type)
-		{
-			case SDB_FETCH_BOTH:
-			{
-				while($fetch = sqlsrv_fetch_array($query))
-					$return[] = $fetch;
-				break;
-			}
-			case SDB_FETCH_ASSOC:
-			{
-				while($fetch = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC))
-					$return[] = $fetch;
-				break;
-			}
-			case SDB_FETCH_NUMERIC:
-			{
-				while($fetch = sqlsrv_fetch_array($query, SQLSRV_FETCH_NUMERIC))
-					$return[] = $fetch;
-				break;
-			}
-		}
+		while($fetch = sqlsrv_fetch_array($this->_Result))
+			$return[] = $fetch;
 		return $return;
 	}
 	
 	protected function _Close()
 	{
 		sqlsrv_close($this->_Connection);
+	}
+	
+	protected function _Free()
+	{
+		sqlsrv_free_stmt($this->_Result);
 	}
 	
 	protected function _Sanitize($argument)

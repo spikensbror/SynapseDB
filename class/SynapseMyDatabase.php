@@ -18,36 +18,22 @@ class SynapseMyDatabase extends SynapseDatabase
 		return @mysql_query($query, $this->_Connection);
 	}
 	
-	protected function _Fetch($type, $query)
+	protected function _FetchAll()
 	{
 		$return = array();
-		switch($type)
-		{
-			case SDB_FETCH_BOTH:
-			{
-				while($fetch = mysql_fetch_array($query))
-					$return[] = $fetch;
-				break;
-			}
-			case SDB_FETCH_ASSOC:
-			{
-				while($fetch = mysql_fetch_assoc($query))
-					$return[] = $fetch;
-				break;
-			}
-			case SDB_FETCH_NUMERIC:
-			{
-				while($fetch = mysql_fetch_row($query))
-					$return[] = $fetch;
-				break;
-			}
-		}
+		while($fetch = mysql_fetch_array($this->_Result))
+			$return[] = $fetch;
 		return $return;
 	}
 	
 	protected function _Close()
 	{
 		mysql_close($this->_Connection);
+	}
+	
+	protected function _Free()
+	{
+		mysql_free_result($this->_Result);
 	}
 	
 	protected function _Sanitize($argument)

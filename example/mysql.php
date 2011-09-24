@@ -29,6 +29,9 @@ $sql->Query('INSERT INTO example_tbl(name, email) VALUES(?, ?);', array('Example
 $sql->Query('SELECT * FROM example_tbl WHERE id = ?;', array('; TRUNCATE example_tbl;#'));
 $sql->Query('SELECT * FROM example_tbl WHERE id = ?;', array('; DELETE example_tbl;#'));
 
+// Execute get query.
+$sql->Query('SELECT * FROM example_tbl ORDER BY id ASC;');
+
 ?>
 
 <!DOCTYPE html>
@@ -42,19 +45,22 @@ $sql->Query('SELECT * FROM example_tbl WHERE id = ?;', array('; DELETE example_t
 		<h3>Hybrid fetch.</h3>
 		<p>
 			<?php
-			var_dump($sql->Fetch('SELECT * FROM example_tbl ORDER BY id ASC;'));
+			while($row = $sql->Fetch())
+				var_dump($row);
 			?>
 		</p>
 		<h3>Associative fetch.</h3>
 		<p>
 			<?php
-			var_dump($sql->FetchAssoc('SELECT * FROM example_tbl ORDER BY id ASC;'));
+			while($row = $sql->Fetch(SDB_FETCH_ASSOC))
+				var_dump($row);
 			?>
 		</p>
 		<h3>Numeric fetch.</h3>
 		<p>
 			<?php
-			var_dump($sql->FetchNumeric('SELECT * FROM example_tbl ORDER BY id ASC;'));
+			while($row = $sql->Fetch(SDB_FETCH_NUMERIC))
+				var_dump($row);
 			?>
 		</p>
 	</body>

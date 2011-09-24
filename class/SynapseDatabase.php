@@ -16,6 +16,32 @@ abstract class SynapseDatabase
 	 */
 	protected $_Connection = null;
 	
+	/**
+	 * SQL result data.
+	 * @var result 
+	 */
+	protected $_Result = null;
+	
+	/**
+	 * SQL fetch data.
+	 * @var array 
+	 */
+	protected $_Fetch = null;
+	
+	/**
+	 * Fetch iterator position.
+	 * @var int 
+	 */
+	protected $_FetchPosition = 0;
+	
+	/**
+	 * Establish a connection for the object.
+	 * @param string $host
+	 * @param string $user
+	 * @param string $password
+	 * @param string $database
+	 * @return bool 
+	 */
 	public function Establish($host, $user, $password, $database)
 	{
 		return $this->_Connect($host, $user, $password, $database);
@@ -42,51 +68,52 @@ abstract class SynapseDatabase
 			if($query[$j] == SynapseDatabase::ARGUMENT_TOKEN)
 			{
 				if(!isset($arguments[$i]))
-					throw new Exception('SynapseDB : Too few arguments supplied!');
+					return false;
 				$query[$j] = $arguments[$i];
 				$i++;
 			}
 		}
 		if($i != sizeof($arguments))
-			throw new Exception('SynapseDB : Too many arguments supplied!');
+			return false;
 		$query = implode('', $query);
 		$result = $this->_Query($query);
-		if(!$result)
+		if(!$result && SDB_DEBUG)
 			throw new Exception('SynapseDB : Query failed! QUERY('.$query.') MESSAGE('.$this->GetLastError().')');
-		return $result;
+		$this->_Result = $result;
+		return true;
 	}
 	
 	/**
 	 * Fetches data in both associative and numerical form from the database.
-	 * @param string $query
-	 * @param array $arguments
+	 * @param int $type
 	 * @return array 
 	 */
-	public function Fetch($query, $arguments = array())
+	public function Fetch($type = SDB_FETCH_BOTH)
 	{
-		return $this->_Fetch(SDB_FETCH_BOTH, $this->Query($query, $arguments));
-	}
-	
-	/**
-	 * Fetches data in an associative form from the database.
-	 * @param string $query
-	 * @param array $arguments
-	 * @return array 
-	 */
-	public function FetchAssoc($query, $arguments = array())
-	{
-		return $this->_Fetch(SDB_FETCH_ASSOC, $this->Query($query, $arguments));
-	}
-	
-	/**
-	 * Fetches data in a numerical from the database.
-	 * @param string $query
-	 * @param array $arguments
-	 * @return array 
-	 */
-	public function FetchNumeric($query, $arguments = array())
-	{
-		return $this->_Fetch(SDB_FETCH_NUMERIC, $this->Query($query, $arguments));
+		if($this->_Result != null)
+		{
+			if($this->_Fetch == null)
+				$this->_Fetch = $this->_FetchAll();
+			if($this->_FetchPosition == sizeof($this->_Fetch))
+				$this->_FetchPosition = 0;
+			else
+			{
+				$row = $this->_Fetch[$this->_FetchPosition++];
+				foreach($row as $key => $value)
+				{
+					if((!is_int($key) && $type == SDB_FETCH_NUMERIC)
+						|| is_int($key) && $type == SDB_FETCH_ASSOC)
+					{
+						unset($row[$key]);
+						continue;
+					}
+					if(is_numeric($value))
+						$row[$key] = (int)$value;
+				}
+				return $row;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -95,6 +122,18 @@ abstract class SynapseDatabase
 	public function Close()
 	{
 		$this->_Close();
+	}
+	
+	/**
+	 * Frees all result related data.
+	 */
+	public function Free()
+	{
+		$this->_FetchPosition = 0;
+		if($this->_Fetch != null)
+			unset($this->_Fetch);
+		if($this->_Result != null)
+			$this->_Free();
 	}
 	
 	// Abstracts.
@@ -110,14 +149,19 @@ abstract class SynapseDatabase
 	abstract protected function _Query($query);
 	
 	/**
-	 * Fetches results from the database.
+	 * Fetches all rows from the current result.
 	 */
-	abstract protected function _Fetch($type, $query);
+	abstract protected function _FetchAll();
 	
 	/**
 	 * Closes the database connection.
 	 */
 	abstract protected function _Close();
+	
+	/**
+	 * Frees the current result.
+	 */
+	abstract protected function _Free();
 	
 	/**
 	 * Sanitizes a query argument.
