@@ -79,6 +79,7 @@ abstract class SynapseDatabase
 		$result = $this->_Query($query);
 		if(!$result && SDB_DEBUG)
 			throw new Exception('SynapseDB : Query failed! QUERY('.$query.') MESSAGE('.$this->GetLastError().')');
+		$this->Free();
 		$this->_Result = $result;
 		return true;
 	}
