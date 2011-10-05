@@ -32,9 +32,9 @@ class SynapseFactory
 	 * @param string $user
 	 * @param string $password
 	 * @param string $database
-	 * @return object 
+	 * @return SynapseDatabase 
 	 */
-	public function Connect($type, $host, $user, $password, $database)
+	public function &Connect($type, $host, $user, $password, $database)
 	{
 		if(!isset($this->_Pool[$type][$database]))
 		{
