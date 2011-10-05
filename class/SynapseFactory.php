@@ -58,7 +58,7 @@ class SynapseFactory
 			if(!$this->_Pool[$type][$database]->Establish($host, $user, $password, $database))
 				throw new Exception('SynapseDB : Failed to connect to database! MESSAGE('.$this->_Pool[$type][$database]->GetLastError().')');
 		}
-		return (isset($this->_Pool[$type][$database])) ? $this->_Pool[$type][$database] : null;
+		return $this->_Pool[$type][$database];
 	}
 	
 	/**
