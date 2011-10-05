@@ -93,7 +93,7 @@ abstract class SynapseDatabase
 	{
 		if($this->_Result != null)
 		{
-			if($this->_Fetch == null)
+			if(!isset($this->_Fetch) || $this->_Fetch == null)
 				$this->_Fetch = $this->_FetchAll();
 			if($this->_FetchPosition == sizeof($this->_Fetch))
 				$this->_FetchPosition = 0;
